@@ -9,6 +9,9 @@ jobs:
   build-manager:
     uses: ./.github/workflows/build-manager.yml
     secrets: inherit
+  build-lkm:
+    uses: ./.github/workflows/build-lkm.yml
+    secrets: inherit
   build-a12-kernel:
     uses: ./.github/workflows/build-kernel-a12.yml
     secrets: inherit
@@ -26,12 +29,13 @@ jobs:
     secrets: inherit
   release:
     needs:
-      - build-manager
-      - build-a12-kernel
-      - build-a13-kernel
-      - build-a14-kernel
-      - build-wsa-kernel
-      - build-arcvm-kernel
+      # - build-manager
+      - build-lkm
+      # - build-a12-kernel
+      # - build-a13-kernel
+      # - build-a14-kernel
+      # - build-wsa-kernel
+      # - build-arcvm-kernel
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
