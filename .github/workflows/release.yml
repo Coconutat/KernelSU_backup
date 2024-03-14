@@ -70,12 +70,12 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
-      - name: release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            manager/*.apk
-            AnyKernel3-*.zip
-            boot-images-*/Image-*/*.img.gz
-            kernel-WSA*.zip
-            kernel-ARCVM*.zip
+      # - name: release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: |
+      #       manager/*.apk
+      #       AnyKernel3-*.zip
+      #       boot-images-*/Image-*/*.img.gz
+      #       kernel-WSA*.zip
+      #       kernel-ARCVM*.zip
