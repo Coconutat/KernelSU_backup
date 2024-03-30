@@ -90,19 +90,8 @@ struct my_dir_context {
 	int depth;
 	int *stop;
 };
-// https://docs.kernel.org/filesystems/porting.html
-// filldir_t (readdir callbacks) calling conventions have changed. Instead of returning 0 or -E... it returns bool now. false means "no more" (as -E... used to) and true - "keep going" (as 0 in old calling conventions). Rationale: callers never looked at specific -E... values anyway. -> iterate_shared() instances require no changes at all, all filldir_t ones in the tree converted.
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
-#define FILLDIR_RETURN_TYPE bool
-#define FILLDIR_ACTOR_CONTINUE true
-#define FILLDIR_ACTOR_STOP false
-#else
-#define FILLDIR_RETURN_TYPE int
-#define FILLDIR_ACTOR_CONTINUE 0
-#define FILLDIR_ACTOR_STOP -EINVAL
-#endif
 
-FILLDIR_RETURN_TYPE my_actor(struct dir_context *ctx, const char *name, int namelen, loff_t off,
+int my_actor(struct dir_context *ctx, const char *name, int namelen, loff_t off,
 	     u64 ino, unsigned int d_type)
 {
 	struct my_dir_context *my_ctx =
@@ -112,18 +101,18 @@ FILLDIR_RETURN_TYPE my_actor(struct dir_context *ctx, const char *name, int name
 
 	if (!my_ctx) {
 		pr_err("Invalid context\n");
-		return FILLDIR_ACTOR_STOP;
+		return -EINVAL;
 	}
 	if (my_ctx->stop && *my_ctx->stop) {
-		return FILLDIR_ACTOR_STOP;
+		return 1;
 	}
 
 	if (!strncmp(name, "..", namelen) || !strncmp(name, ".", namelen))
-		return FILLDIR_ACTOR_CONTINUE; // Skip "." and ".."
+		return 0; // Skip "." and ".."
 
 	dirpath = kmalloc(PATH_MAX, GFP_KERNEL);
 	if (!dirpath) {
-		return FILLDIR_ACTOR_STOP; // Failed to obtain directory path
+		return -ENOMEM; // Failed to obtain directory path
 	}
 	snprintf(dirpath, PATH_MAX, "%s/%.*s", my_ctx->parent_dir, namelen,
 		 name);
@@ -141,7 +130,7 @@ FILLDIR_RETURN_TYPE my_actor(struct dir_context *ctx, const char *name, int name
 			pr_err("Failed to open directory: %s, err: %d\n",
 			       dirpath, PTR_ERR(file));
 			kfree(dirpath);
-			return FILLDIR_ACTOR_STOP;
+			return PTR_ERR(file);
 		}
 
 		iterate_dir(file, &sub_ctx.ctx);
@@ -160,7 +149,7 @@ FILLDIR_RETURN_TYPE my_actor(struct dir_context *ctx, const char *name, int name
 		kfree(dirpath);
 	}
 
-	return FILLDIR_ACTOR_CONTINUE;
+	return 0;
 }
 
 void search_manager(const char *path, int depth, struct list_head *uid_data)
