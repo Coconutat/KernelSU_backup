@@ -15,12 +15,12 @@ else
      exit 127
 fi
 
-test -d "$GKI_ROOT/KernelSU" || git clone https://github.com/Coconutat/KernelSU_backup.git -b 0.9.2_upstream
+test -d "$GKI_ROOT/KernelSU" || git clone https://github.com/Coconutat/KernelSU_backup.git -b 0.9.2_upstream_backup
 mv -vf "$GKI_ROOT/KernelSU_backup" "$GKI_ROOT/KernelSU"
 cd "$GKI_ROOT/KernelSU"
 git stash
 if [ "$(git status | grep -Po 'v\d+(\.\d+)*' | head -n1)" ]; then
-     git checkout "0.9.2_upstream" 
+     git checkout "0.9.2_upstream_backup" 
 fi
 git pull
 if [ -z "${1-}" ]; then
