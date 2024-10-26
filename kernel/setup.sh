@@ -39,11 +39,12 @@ perform_cleanup() {
 # Sets up or update KernelSU environment
 setup_kernelsu() {
     echo "[+] Setting up KernelSU..."
-    test -d "$GKI_ROOT/KernelSU" || git clone https://github.com/tiann/KernelSU && echo "[+] Repository cloned."
+    test -d "$GKI_ROOT/KernelSU" || git clone https://github.com/Coconutat/KernelSU_backup -b Huawei_NewDevice && echo "[+] Repository cloned."
+    mv -vf "$GKI_ROOT/KernelSU_backup" "$GKI_ROOT/KernelSU"
     cd "$GKI_ROOT/KernelSU"
     git stash && echo "[-] Stashed current changes."
     if [ "$(git status | grep -Po 'v\d+(\.\d+)*' | head -n1)" ]; then
-        git checkout main && echo "[-] Switched to main branch."
+        git checkout Huawei_NewDevice && echo "[-] Switched to Huawei_NewDevice branch."
     fi
     git pull && echo "[+] Repository updated."
     if [ -z "${1-}" ]; then
