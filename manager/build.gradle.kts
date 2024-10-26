@@ -31,7 +31,7 @@ val androidMinSdkVersion = 26
 val androidTargetSdkVersion = 35
 val androidCompileSdkVersion = 35
 val androidBuildToolsVersion = "35.0.0"
-val androidCompileNdkVersion = "27.0.11718014-beta1"
+val androidCompileNdkVersion = "27.0.12077973"
 val androidSourceCompatibility = JavaVersion.VERSION_21
 val androidTargetCompatibility = JavaVersion.VERSION_21
 val managerVersionCode by extra(getVersionCode())
@@ -78,6 +78,9 @@ subprojects {
                     targetSdk = androidTargetSdkVersion
                     versionCode = managerVersionCode
                     versionName = managerVersionName
+                }
+                ndk {
+                    abiFilters += listOf("arm64-v8a", "x86_64", "riscv64")
                 }
             }
 
